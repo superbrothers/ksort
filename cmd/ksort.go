@@ -148,16 +148,27 @@ func (o *options) run() error {
 
 	// extract kind and name
 	re := regexp.MustCompile("kind:(.*)\n")
+	// YAML separator
+	sep := regexp.MustCompile("(?m)^---.*$")
 	manifests := []tiller.Manifest{}
 	for k, v := range contents {
-		match := re.FindStringSubmatch(v)
-		h := kindUnknown
-		if len(match) == 2 {
-			h = strings.TrimSpace(match[1])
+		docs := sep.Split(v, -1)
+		for _, doc := range docs {
+			if len(doc) == 0 {
+				continue
+			}
+			match := re.FindStringSubmatch(doc)
+			h := kindUnknown
+			if len(match) == 2 {
+				h = strings.TrimSpace(match[1])
+			}
+			doc = strings.Trim(doc, "\n")
+			m := tiller.Manifest{Name: k, Content: doc, Head: &util.SimpleHead{Kind: h}}
+			manifests = append(manifests, m)
+			glog.V(2).Infof("Found %s in %q", h, k)
 		}
-		m := tiller.Manifest{Name: k, Content: v, Head: &util.SimpleHead{Kind: h}}
-		manifests = append(manifests, m)
 	}
+	glog.V(2).Infof("Found %d objects in total", len(manifests))
 
 	for _, m := range tiller.SortByKind(manifests) {
 		fmt.Printf("---\n# Source: %s\n", m.Name)
