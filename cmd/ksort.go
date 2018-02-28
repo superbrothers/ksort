@@ -45,7 +45,7 @@ ksort ./deploy | kubectl apply -f -`
 )
 
 type options struct {
-	path string
+	filename string
 }
 
 func init() {
@@ -56,7 +56,7 @@ func New() *cobra.Command {
 	o := options{}
 
 	cmd := &cobra.Command{
-		Use:     "ksort PATH",
+		Use:     "ksort FILENAME",
 		Short:   "ksort sorts manfest files in a proper order by Kind.",
 		Long:    ksortLong,
 		Example: ksortExample,
@@ -89,23 +89,16 @@ func New() *cobra.Command {
 func (o *options) complete(cmd *cobra.Command, args []string) error {
 	switch len(args) {
 	case 0:
-		return errors.New("path is required")
+		return errors.New("filename is required")
 	case 1:
-		var err error
-
-		// verify manifest path exists
-		info, err := os.Stat(args[0])
-		if err != nil {
+		// verify manifest file exists
+		if _, err := os.Stat(args[0]); err != nil {
 			return err
 		}
 
-		if !info.IsDir() {
-			return fmt.Errorf("%q is not a directory", args[0])
-		}
-
-		o.path = args[0]
+		o.filename = args[0]
 	default:
-		return errors.New("only one of path is allowed")
+		return errors.New("only one of filename is allowed")
 	}
 
 	return nil
@@ -114,13 +107,13 @@ func (o *options) complete(cmd *cobra.Command, args []string) error {
 func (o *options) run() error {
 	contents := map[string]string{}
 
-	glog.V(2).Infof("Walking the file tree rooted at %q", o.path)
+	glog.V(2).Infof("Walking the file tree rooted at %q", o.filename)
 
-	err := filepath.Walk(o.path, func(path string, info os.FileInfo, err error) error {
+	err := filepath.Walk(o.filename, func(path string, info os.FileInfo, err error) error {
 		glog.V(2).Infof("Visiting %q", path)
 
 		if err != nil {
-			return fmt.Errorf("Failed to access a path %q: %v\n", o.path, err)
+			return fmt.Errorf("Failed to access a path %q: %v\n", o.filename, err)
 		}
 
 		if info.IsDir() {
@@ -143,7 +136,7 @@ func (o *options) run() error {
 	}
 
 	if len(contents) == 0 {
-		return fmt.Errorf("File does not exist in %s", o.path)
+		return fmt.Errorf("File does not exist in %s", o.filename)
 	}
 
 	// extract kind and name
