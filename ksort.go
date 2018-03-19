@@ -5,12 +5,13 @@ For the full copyright and license information, please view the LICENSE
 file that was distributed with this source code.
 */
 
-package cmd
+package ksort
 
 import (
 	"errors"
 	"flag"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -19,7 +20,6 @@ import (
 
 	"github.com/golang/glog"
 	"github.com/spf13/cobra"
-	"github.com/superbrothers/ksort/version"
 	util "k8s.io/helm/pkg/releaseutil"
 	"k8s.io/helm/pkg/tiller"
 )
@@ -52,7 +52,7 @@ func init() {
 	flag.Set("logtostderr", "true")
 }
 
-func New() *cobra.Command {
+func NewCommand(in io.Reader, out, errOut io.Writer) *cobra.Command {
 	o := options{}
 
 	cmd := &cobra.Command{
@@ -62,7 +62,7 @@ func New() *cobra.Command {
 		Example: ksortExample,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if printVersion {
-				fmt.Printf("%#v\n", version.NewInfo())
+				fmt.Fprintf(errOut, "%#v\n", newInfo())
 				return nil
 			}
 
@@ -72,9 +72,11 @@ func New() *cobra.Command {
 
 			cmd.SilenceUsage = true
 
-			return o.run()
+			return o.run(out)
 		},
 	}
+
+	cmd.SetOutput(errOut)
 
 	cmd.Flags().BoolVar(&printVersion, "version", printVersion, "Print the version and exit")
 	cmd.Flags().AddGoFlagSet(flag.CommandLine)
@@ -104,7 +106,7 @@ func (o *options) complete(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
-func (o *options) run() error {
+func (o *options) run(out io.Writer) error {
 	contents := map[string]string{}
 
 	glog.V(2).Infof("Walking the file tree rooted at %q", o.filename)
@@ -164,14 +166,14 @@ func (o *options) run() error {
 	glog.V(2).Infof("Found %d objects in total", len(manifests))
 
 	for _, m := range tiller.SortByKind(manifests) {
-		fmt.Printf("---\n# Source: %s\n", m.Name)
+		fmt.Fprintf(out, "---\n# Source: %s\n", m.Name)
 
 		if m.Head.Kind == kindUnknown {
-			fmt.Println("# WARNING: It looks like that this file is not a manifest file")
+			fmt.Fprintln(out, "# WARNING: It looks like that this file is not a manifest file")
 			continue
 		}
 
-		fmt.Println(m.Content)
+		fmt.Fprintln(out, m.Content)
 	}
 
 	return nil

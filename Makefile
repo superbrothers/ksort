@@ -13,14 +13,18 @@ BUILD_DATE = $(shell date -u +'%Y-%m-%dT%H:%M:%SZ')
 GO ?= go
 OUT_DIR ?= _output
 LD_FLAGS :=
-LDFLAGS += -X $(REPO_PATH)/version.GitCommit=$(GIT_COMMIT)
-LDFLAGS += -X $(REPO_PATH)/version.GitVersion=$(GIT_VERSION)
-LDFLAGS += -X $(REPO_PATH)/version.GitTreeState=$(GIT_TREE_STATE)
-LDFLAGS += -X $(REPO_PATH)/version.BuildDate=$(BUILD_DATE)
+LDFLAGS += -X $(REPO_PATH).GitCommit=$(GIT_COMMIT)
+LDFLAGS += -X $(REPO_PATH).GitVersion=$(GIT_VERSION)
+LDFLAGS += -X $(REPO_PATH).GitTreeState=$(GIT_TREE_STATE)
+LDFLAGS += -X $(REPO_PATH).BuildDate=$(BUILD_DATE)
 
 .PHONY: build
 build:
-		@$(GO) build -o $(OUT_DIR)/$(PROJ) -ldflags '$(LDFLAGS)' .
+		@$(GO) build -o $(OUT_DIR)/$(PROJ) -ldflags '$(LDFLAGS)' ./cmd/ksort
+
+.PHONY: test
+test:
+		@$(GO) test -v ./...
 
 .PHONY: clean
 clean:

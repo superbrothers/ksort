@@ -10,11 +10,12 @@ package main
 import (
 	"os"
 
-	"github.com/superbrothers/ksort/cmd"
+	"github.com/superbrothers/ksort"
 )
 
 func main() {
-	if err := cmd.New().Execute(); err != nil {
+	cmd := ksort.NewCommand(os.Stdin, os.Stdout, os.Stderr)
+	if err := cmd.Execute(); err != nil {
 		os.Exit(1)
 	}
 }

@@ -5,7 +5,7 @@ For the full copyright and license information, please view the LICENSE
 file that was distributed with this source code.
 */
 
-package version
+package ksort
 
 import (
 	"fmt"
@@ -19,7 +19,7 @@ var (
 	BuildDate    = "1970-01-01T00:00:00Z"
 )
 
-type Info struct {
+type info struct {
 	GitVersion   string
 	GitCommit    string
 	GitTreeState string
@@ -29,8 +29,8 @@ type Info struct {
 	Platform     string
 }
 
-func NewInfo() *Info {
-	return &Info{
+func newInfo() *info {
+	return &info{
 		GitVersion:   GitVersion,
 		GitCommit:    GitCommit,
 		GitTreeState: GitTreeState,
