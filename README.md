@@ -13,21 +13,26 @@ ksort sorts manfest files in a proper order by Kind, which is implementd by usin
 Sort manifest files in the `deploy` directory in the proper order, and output the result to the stdout.
 
 ```
-$ ls ./deploy
+$ ls ./manifests
 deployment.yaml  ingress.yaml  namespace.yaml  service.yaml
-$ ksort ./deploy
+$ ksort ./manifests
 ```
 
 To pass the result into the stdin of `kubectl apply` command is also convenient.
 
 ```
-$ ksort ./deploy | kubectl apply -f -
+$ ksort ./manifests | kubectl apply -f -
+```
+
+Sort the manifests contained the manifest file that is specified.
+```
+$ ksort ./app.yaml
 ```
 
 ## Installation
 
 ```
-$ go get github.com/superbrothers/ksort
+$ go get github.com/superbrothers/ksort/cmd
 ```
 
 ## License
