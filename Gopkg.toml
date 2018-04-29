@@ -27,7 +27,7 @@
 
 [[constraint]]
   name = "k8s.io/helm"
-  version = "~2.8.1"
+  version = "~2.9.0"
 
 [[constraint]]
   name = "github.com/spf13/cobra"
@@ -39,23 +39,27 @@
 
 [[override]]
   name = "k8s.io/kubernetes"
-  branch = "release-1.9"
+  branch = "release-1.10"
 
 [[override]]
   name = "k8s.io/client-go"
-  branch = "release-6.0"
+  version = "kubernetes-1.10.0"
 
 [[override]]
   name = "k8s.io/api"
-  branch = "release-1.9"
+  branch = "release-1.10"
 
 [[override]]
   name = "k8s.io/apimachinery"
-  branch = "release-1.9"
+  branch = "release-1.10"
 
 [[override]]
   name = "k8s.io/apiserver"
-  branch = "release-1.9"
+  branch = "release-1.10"
+
+[[override]]
+  name = "k8s.io/apiextensions-apiserver"
+  branch = "release-1.10"
 
 # Fix vendor/k8s.io/kubernetes/pkg/util/parsers/parsers.go:36:16: undefined: reference.ParseNormalizedNamed
 [[override]]
