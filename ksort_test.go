@@ -13,8 +13,7 @@ func TestCommand(t *testing.T) {
 	}{
 		{
 			args: []string{"testdata/rbac.yaml"},
-			out: `---
-# Source: testdata/rbac.yaml
+			out: `# Source: testdata/rbac.yaml
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
@@ -41,8 +40,7 @@ metadata:
 		},
 		{
 			args: []string{"testdata"},
-			out: `---
-# Source: testdata/configmap.yaml
+			out: `# Source: testdata/configmap.yaml
 apiVersion: v1
 kind: ConfigMap
 metadata:
