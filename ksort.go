@@ -168,16 +168,19 @@ func (o *options) run(out io.Writer) error {
 	}
 	glog.V(2).Infof("Found %d objects in total", len(manifests))
 
-	for _, m := range tiller.SortByKind(manifests) {
-		fmt.Fprintf(out, "---\n# Source: %s\n", m.Name)
+	a := make([]string, len(manifests))
+	for i, m := range tiller.SortByKind(manifests) {
+		a[i] += fmt.Sprintf("# Source: %s\n", m.Name)
 
 		if m.Head.Kind == kindUnknown {
-			fmt.Fprintln(out, "# WARNING: It looks like that this file is not a manifest file")
+			a[i] += "# WARNING: It looks like that this file is not a manifest file\n"
 			continue
 		}
 
-		fmt.Fprintln(out, m.Content)
+		a[i] += m.Content
 	}
+
+	fmt.Fprintln(out, strings.Join(a, "\n---\n"))
 
 	return nil
 }
