@@ -77,6 +77,39 @@ metadata:
   name: deployment
 `,
 		},
+		{
+			args: []string{"testdata/deployment.yaml", "testdata/rbac.yaml"},
+			out: `# Source: testdata/rbac.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: ClusterRole
+---
+# Source: testdata/rbac.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: ClusterRoleBinding
+---
+# Source: testdata/rbac.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: Role
+---
+# Source: testdata/rbac.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: RoleBinding
+---
+# Source: testdata/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deployment
+`,
+		},
 	}
 
 	for i, tt := range tests {

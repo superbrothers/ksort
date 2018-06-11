@@ -48,7 +48,7 @@ ksort app.yaml`
 )
 
 type options struct {
-	filename string
+	filenames []string
 }
 
 func init() {
@@ -59,7 +59,7 @@ func NewCommand(in io.Reader, out, errOut io.Writer) *cobra.Command {
 	o := options{}
 
 	cmd := &cobra.Command{
-		Use:     "ksort FILENAME",
+		Use:     "ksort FILENAME...",
 		Short:   "ksort sorts manfest files in a proper order by Kind.",
 		Long:    ksortLong,
 		Example: ksortExample,
@@ -92,19 +92,18 @@ func NewCommand(in io.Reader, out, errOut io.Writer) *cobra.Command {
 }
 
 func (o *options) complete(cmd *cobra.Command, args []string) error {
-	switch len(args) {
-	case 0:
+	if len(args) == 0 {
 		return errors.New("filename is required")
-	case 1:
-		// verify manifest file exists
-		if _, err := os.Stat(args[0]); err != nil {
+	}
+
+	// verify manifest file exists
+	for _, filename := range args {
+		if _, err := os.Stat(filename); err != nil {
 			return err
 		}
-
-		o.filename = args[0]
-	default:
-		return errors.New("only one of filename is allowed")
 	}
+
+	o.filenames = args
 
 	return nil
 }
@@ -112,36 +111,43 @@ func (o *options) complete(cmd *cobra.Command, args []string) error {
 func (o *options) run(out io.Writer) error {
 	contents := map[string]string{}
 
-	glog.V(2).Infof("Walking the file tree rooted at %q", o.filename)
+	for _, filename := range o.filenames {
+		glog.V(2).Infof("Walking the file tree rooted at %q", filename)
 
-	err := filepath.Walk(o.filename, func(path string, info os.FileInfo, err error) error {
-		glog.V(2).Infof("Visiting %q", path)
+		err := filepath.Walk(filename, func(path string, info os.FileInfo, err error) error {
+			glog.V(2).Infof("Visiting %q", path)
 
-		if err != nil {
-			return fmt.Errorf("Failed to access a path %q: %v\n", o.filename, err)
-		}
+			if err != nil {
+				return fmt.Errorf("Failed to access a path %q: %v\n", filename, err)
+			}
 
-		if info.IsDir() {
-			glog.V(2).Infof("Skip %q because it's directory", path)
+			if info.IsDir() {
+				glog.V(2).Infof("Skip %q because it's directory", path)
+				return nil
+			}
+
+			if _, ok := contents[path]; ok {
+				glog.V(2).Infof("Skip reading %q because it already went through", path)
+				return nil
+			}
+
+			content, err := ioutil.ReadFile(path)
+			if err != nil {
+				return fmt.Errorf("Failed to read a file %q: %v\n", path, err)
+			}
+
+			contents[path] = string(content)
+
 			return nil
-		}
+		})
 
-		content, err := ioutil.ReadFile(path)
 		if err != nil {
-			return fmt.Errorf("Failed to read a file %q: %v\n", path, err)
+			return err
 		}
-
-		contents[path] = string(content)
-
-		return nil
-	})
-
-	if err != nil {
-		return err
 	}
 
 	if len(contents) == 0 {
-		return fmt.Errorf("File does not exist in %s", o.filename)
+		return errors.New("File does not exist")
 	}
 
 	// extract kind and name
