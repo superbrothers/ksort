@@ -35,14 +35,14 @@ For example, Namespace object must be in the first place when installing them.
 ksort sorts manfest files in a proper order by Kind, which is implementd by
 using SortByKind function in Kubernetes Helm.`
 
-	ksortExample = `# Sort manifest files under the manifests directory, and output the result to the stdout.
-ksort ./manifests
+	ksortExample = `  # Sort manifest files under the manifests directory, and output the result to the stdout.
+  ksort ./manifests
 
-# To pass the result into the stdin of kubectl apply command is also convenient.
-ksort ./manifests | kubectl apply -f -
+  # To pass the result into the stdin of kubectl apply command is also convenient.
+  ksort ./manifests | kubectl apply -f -
 
-# Sort manifests contained the manifest file.
-ksort app.yaml`
+  # Sort manifests contained the manifest file.
+  ksort app.yaml`
 
 	kindUnknown = "Unknown"
 )
