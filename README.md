@@ -24,7 +24,7 @@ To pass the result into the stdin of `kubectl apply` command is also convenient.
 $ ksort ./manifests | kubectl apply -f -
 ```
 
-Sort the manifests contained the manifest file that is specified.
+Sort manifests contained the manifest file that is specified.
 ```
 $ ksort ./app.yaml
 ```

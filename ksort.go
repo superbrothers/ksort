@@ -42,13 +42,17 @@ using SortByKind function in Kubernetes Helm.`
   ksort ./manifests | kubectl apply -f -
 
   # Sort manifests contained the manifest file.
-  ksort app.yaml`
+  ksort app.yaml
+  
+  # Sort manifests in uninstall order.
+  ksort ./manifests --delete`
 
 	kindUnknown = "Unknown"
 )
 
 type options struct {
 	filenames []string
+	delete    bool
 }
 
 func init() {
@@ -81,6 +85,7 @@ func NewCommand(in io.Reader, out, errOut io.Writer) *cobra.Command {
 
 	cmd.SetOutput(errOut)
 
+	cmd.Flags().BoolVarP(&o.delete, "delete", "d", o.delete, "Sort manifests in uninstall order")
 	cmd.Flags().BoolVar(&printVersion, "version", printVersion, "Print the version and exit")
 	cmd.Flags().AddGoFlagSet(flag.CommandLine)
 
@@ -176,6 +181,10 @@ func (o *options) run(out io.Writer) error {
 
 	a := make([]string, len(manifests))
 	for i, m := range tiller.SortByKind(manifests) {
+		if o.delete {
+			i = len(manifests) - (i + 1)
+		}
+
 		a[i] += fmt.Sprintf("# Source: %s\n", m.Name)
 
 		if m.Head.Kind == kindUnknown {
