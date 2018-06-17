@@ -35,10 +35,8 @@ test:
 clean:
 		@$(RM) -rf $(OUT_DIR)
 
-HAS_DEP := $(shell command -v dep;)
-
-.PHONY: bootstrap
-bootstrap:
-ifndef HAS_DEP
-	go get -u github.com/golang/dep
-endif
+DEP_VERSION ?= 0.4
+DEP ?= docker run --rm -w $(GO_WORKDIR) -v $(shell pwd):$(GO_WORKDIR) instrumentisto/dep:$(DEP_VERSION)
+.PHONY: update-vendor
+update-vendor:
+		@$(DEP) ensure
