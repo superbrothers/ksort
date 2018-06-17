@@ -17,7 +17,7 @@ GOCACHE ?= $(shell pwd)/.go-build
 GO_WORKDIR := /go/src/$(REPO_PATH)
 GO ?= docker run --rm -e GOOS -e GOARCH -e CGO_ENABLED=0 -w $(GO_WORKDIR) -v $(shell pwd):$(GO_WORKDIR) -v $(GOCACHE):/root/.cache/go-build golang:$(GO_VERSION) go
 OUT_DIR ?= _output
-LD_FLAGS :=
+LDFLAGS :=
 LDFLAGS += -X $(REPO_PATH).GitCommit=$(GIT_COMMIT)
 LDFLAGS += -X $(REPO_PATH).GitVersion=$(GIT_VERSION)
 LDFLAGS += -X $(REPO_PATH).GitTreeState=$(GIT_TREE_STATE)
