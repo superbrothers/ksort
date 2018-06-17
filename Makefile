@@ -1,16 +1,21 @@
-PROJ=ksort
-ORG_PATH=github.com/superbrothers
-REPO_PATH=$(ORG_PATH)/$(PROJ)
+PROJ := ksort
+ORG_PATH := github.com/superbrothers
+REPO_PATH := $(ORG_PATH)/$(PROJ)
 
-GIT_COMMIT = $(shell git rev-parse HEAD)
-GIT_VERSION = $(shell git describe --tags --abbrev=0 --exact-match 2>/dev/null)
+GIT_COMMIT := $(shell git rev-parse HEAD)
+GIT_VERSION := $(shell git describe --tags --abbrev=0 --exact-match 2>/dev/null)
 ifeq ($(GIT_VERSION),)
-	GIT_VERSION = $(GIT_COMMIT)
+GIT_VERSION := $(GIT_COMMIT)
 endif
-GIT_TREE_STATE = $(shell test -n "`git status --porcelain`" && echo "dirty" || echo "clean")
-BUILD_DATE = $(shell date -u +'%Y-%m-%dT%H:%M:%SZ')
+GIT_TREE_STATE := $(shell test -n "`git status --porcelain`" && echo "dirty" || echo "clean")
+BUILD_DATE := $(shell date -u +'%Y-%m-%dT%H:%M:%SZ')
 
-GO ?= go
+GO_VERSION ?= 1.10
+GOOS ?= $(shell go env GOOS)
+GOARCH ?= $(shell go env GOARCH)
+GOCACHE ?= $(shell pwd)/.go-build
+GO_WORKDIR := /go/src/$(REPO_PATH)
+GO ?= docker run --rm -e GOOS -e GOARCH -e CGO_ENABLED=0 -w $(GO_WORKDIR) -v $(shell pwd):$(GO_WORKDIR) -v $(GOCACHE):/root/.cache/go-build golang:$(GO_VERSION) go
 OUT_DIR ?= _output
 LD_FLAGS :=
 LDFLAGS += -X $(REPO_PATH).GitCommit=$(GIT_COMMIT)
@@ -20,7 +25,7 @@ LDFLAGS += -X $(REPO_PATH).BuildDate=$(BUILD_DATE)
 
 .PHONY: build
 build:
-		@$(GO) build -o $(OUT_DIR)/$(PROJ) -ldflags '$(LDFLAGS)' ./cmd/ksort
+		@$(GO) build -o $(OUT_DIR)/$(PROJ) -a -installsuffix cgo -ldflags '$(LDFLAGS)' ./cmd/ksort
 
 .PHONY: test
 test:
