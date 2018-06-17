@@ -11,8 +11,8 @@ GIT_TREE_STATE := $(shell test -n "`git status --porcelain`" && echo "dirty" || 
 BUILD_DATE := $(shell date -u +'%Y-%m-%dT%H:%M:%SZ')
 
 GO_VERSION ?= 1.10
-GOOS ?= $(shell go env GOOS)
-GOARCH ?= $(shell go env GOARCH)
+GOOS ?= $(shell uname | tr A-Z a-z)
+GOARCH ?= amd64
 GOCACHE ?= $(shell pwd)/.go-build
 GO_WORKDIR := /go/src/$(REPO_PATH)
 GO ?= docker run --rm -e GOOS -e GOARCH -e CGO_ENABLED=0 -w $(GO_WORKDIR) -v $(shell pwd):$(GO_WORKDIR) -v $(GOCACHE):/root/.cache/go-build golang:$(GO_VERSION) go
