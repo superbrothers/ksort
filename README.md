@@ -1,5 +1,7 @@
 # ksort
 
+[![Build Status](https://travis-ci.org/superbrothers/ksort.svg?branch=master)](https://travis-ci.org/superbrothers/ksort)
+
 This is a tool which does in-place sort of Kubernetes manifests by Kind.
 
 ## Description
