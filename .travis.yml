@@ -1,9 +1,8 @@
-sudo: required
+language: go
 
-language: bash
-
-services:
-- docker
+go:
+- "1.12"
 
 script:
+- export GO=$(which go) GO111MODULE=on
 - make test
