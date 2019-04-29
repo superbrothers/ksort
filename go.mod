@@ -54,6 +54,7 @@ require (
 	k8s.io/cli-runtime v0.0.0-20190425173743-daa7a1d0e123 // indirect
 	k8s.io/cloud-provider v0.0.0-20190425174118-0a4f4cbb5a66 // indirect
 	k8s.io/helm v2.13.1+incompatible
+	k8s.io/klog v0.3.0
 	k8s.io/kube-openapi v0.0.0-20190426233423-c5d3b0f4bee0 // indirect
 	k8s.io/kubernetes v0.0.0-00010101000000-000000000000 // indirect
 	k8s.io/utils v0.0.0-20190308190857-21c4ce38f2a7 // indirect

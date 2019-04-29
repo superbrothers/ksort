@@ -18,10 +18,10 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/golang/glog"
 	"github.com/spf13/cobra"
 	util "k8s.io/helm/pkg/releaseutil"
 	"k8s.io/helm/pkg/tiller"
+	"k8s.io/klog"
 )
 
 var (
@@ -117,22 +117,22 @@ func (o *options) run(out io.Writer) error {
 	contents := map[string]string{}
 
 	for _, filename := range o.filenames {
-		glog.V(2).Infof("Walking the file tree rooted at %q", filename)
+		klog.V(2).Infof("Walking the file tree rooted at %q", filename)
 
 		err := filepath.Walk(filename, func(path string, info os.FileInfo, err error) error {
-			glog.V(2).Infof("Visiting %q", path)
+			klog.V(2).Infof("Visiting %q", path)
 
 			if err != nil {
 				return fmt.Errorf("Failed to access a path %q: %v\n", filename, err)
 			}
 
 			if info.IsDir() {
-				glog.V(2).Infof("Skip %q because it's directory", path)
+				klog.V(2).Infof("Skip %q because it's directory", path)
 				return nil
 			}
 
 			if _, ok := contents[path]; ok {
-				glog.V(2).Infof("Skip reading %q because it already went through", path)
+				klog.V(2).Infof("Skip reading %q because it already went through", path)
 				return nil
 			}
 
@@ -174,10 +174,10 @@ func (o *options) run(out io.Writer) error {
 			doc = strings.Trim(doc, "\n")
 			m := tiller.Manifest{Name: k, Content: doc, Head: &util.SimpleHead{Kind: h}}
 			manifests = append(manifests, m)
-			glog.V(2).Infof("Found %s in %q", h, k)
+			klog.V(2).Infof("Found %s in %q", h, k)
 		}
 	}
-	glog.V(2).Infof("Found %d objects in total", len(manifests))
+	klog.V(2).Infof("Found %d objects in total", len(manifests))
 
 	a := make([]string, len(manifests))
 	for i, m := range tiller.SortByKind(manifests) {
