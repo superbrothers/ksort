@@ -10,19 +10,23 @@ endif
 GIT_TREE_STATE := $(shell test -n "`git status --porcelain`" && echo "dirty" || echo "clean")
 BUILD_DATE := $(shell date -u +'%Y-%m-%dT%H:%M:%SZ')
 
-GO_VERSION ?= 1.10
+GO_VERSION ?= 1.12
 GOOS ?= $(shell uname | tr A-Z a-z)
 GOARCH ?= amd64
 GOCACHE ?= $(shell pwd)/.go-build
+GOPATH ?= $(shell go env GOPATH)
 GO_WORKDIR := /go/src/$(REPO_PATH)
 GO ?= docker run \
     --rm \
+    -u $(shell id -u) \
     -e GOOS=$(GOOS) \
+    -e GOCACHE=$(GO_WORKDIR)/.go-build \
     -e GOARCH=$(GOARCH) \
+    -e GO111MODULE=on \
     -e CGO_ENABLED=0 \
     -w $(GO_WORKDIR) \
     -v $(shell pwd):$(GO_WORKDIR) \
-    -v $(GOCACHE):/root/.cache/go-build \
+    -v $(GOPATH)/pkg/mod:/go/pkg/mod \
     golang:$(GO_VERSION) \
     go
 OUT_DIR ?= _output
@@ -34,18 +38,12 @@ LDFLAGS += -X $(REPO_PATH).BuildDate=$(BUILD_DATE)
 
 .PHONY: build
 build:
-		@$(GO) build -o $(OUT_DIR)/$(PROJ) -a -installsuffix cgo -ldflags '$(LDFLAGS)' ./cmd/ksort
+		$(GO) build -o $(OUT_DIR)/$(PROJ) -a -installsuffix cgo -ldflags '$(LDFLAGS)' ./cmd/ksort
 
 .PHONY: test
 test:
-		@$(GO) test -v ./...
+		$(GO) test -v ./...
 
 .PHONY: clean
 clean:
-		@$(RM) -rf $(OUT_DIR)
-
-DEP_VERSION ?= 0.4
-DEP ?= docker run --rm -w $(GO_WORKDIR) -v $(shell pwd):$(GO_WORKDIR) instrumentisto/dep:$(DEP_VERSION)
-.PHONY: update-vendor
-update-vendor:
-		@$(DEP) ensure
+		$(RM) -rf $(OUT_DIR)
