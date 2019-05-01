@@ -3,7 +3,7 @@ kind: Plugin
 metadata:
   name: sort-by-kind
 spec:
-  version: "KSORT_TAG"
+  version: KSORT_VERSION
   shortDescription: Sort manfest files in a proper order by Kind
   description: |
     When installing manifests, they should be sorted in a proper order by Kind.
