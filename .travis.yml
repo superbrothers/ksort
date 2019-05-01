@@ -20,4 +20,4 @@ deploy:
   - "out/sort-by-kind.yaml"
   skip_cleanup: true
   on:
-    tag: true
+    tags: true
