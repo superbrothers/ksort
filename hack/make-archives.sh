@@ -32,7 +32,7 @@ done
 
 # Copy and process ksort manifest
 cp hack/sort-by-kind.yaml out/sort-by-kind.yaml
-git_tag="${TAG_NAME:-$(git describe --tags --dirty --always)}"
+git_tag="${TRAVIS_TAG:-$(git describe --tags --dirty --always)}"
 sed -i \
   -e "s/KSORT_DARWIN_ZIP_CHECKSUM/$(cat out/ksort-darwin-amd64.zip.sha256)/g" \
   -e "s/KSORT_LINUX_ZIP_CHECKSUM/$(cat out/ksort-linux-amd64.zip.sha256)/g" \
