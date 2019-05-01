@@ -1,8 +1,23 @@
+sudo: false
 language: go
-
 go:
-- "1.12"
-
+- '1.12'
+env:
+- GO111MODULE=on
+before_install:
+- go get github.com/mitchellh/gox
 script:
-- export GO=$(which go) GO111MODULE=on
 - make test
+- make archives test-archive
+deploy:
+  provider: releases
+  api_key:
+    secure: P3Kb4ZXMt4cAe+tGpwfzrhgC1nrTF+XfGpDFCUX5j7eMto+eqHD1mHE/ieb6QzVv5F/cYwoe+ix7/rx1yYwsbLfCA5Y/OKYFfByB/BR+5y2mLzkqxMHHVSk78hApaaLpVMKvcxqFE4salxDSdLJYJmbw1u09/8TpKTZ6gPHdk9WsvB/1RdGdF8fNiZpOAlKUUwoVdPXtPrr1YW/lb7jjhSdO6Y6Si8Imb8ZzXG8+75KrSRgjKLgX+wAhD8S60XKidaa2BKU5VNzNcc6HOl8kHSOCnbT/uzAMJ5/oZbvG1YMPudOpBP+jIrCVlQdcSQj3A9n2HUI1R+ukafFE3Xd+Y/wv8Xg+Ho4RBP3uUrFsqR4iR07c9+nNBZ25+/BIWJ1gjaHO88J2Nz8xUrWSeiFrq+GY68ZQBsR2KRf63oeuEQB1S/EtHOwbUiex+zQumh8/J9bl/m9S7Wi551ZaTHlIWrC1tKA7fJodzXnETLiGlQ4CiIQRMgWKLRHAx1wb4pMYyQprxSRXBpKc5OWjjyQAj1QG4lZhwfmT6/kAW2gAnct0kk9DVyvRb+wZvBlosKcj3FiBJH9U+/b70yHtCHYze8bnsVQEV3KWxQOJ8Ykgu9qGqg1D6srIN+N1bqQc70oFmBvGuYnqdVcVrwBOoIBnhB2znhiFMgSApPzmgVnOWVQ=
+  file_glob: true
+  file:
+  - "out/*.zip"
+  - "out/*.zip.sha256"
+  - "out/sort-by-kind.yaml"
+  skip_cleanup: true
+  on:
+    tag: true
