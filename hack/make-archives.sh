@@ -31,12 +31,12 @@ for osarch in $(ls "$bin_dir"); do
 done
 
 # Copy and process ksort manifest
-cp hack/sort-by-kind.yaml out/sort-by-kind.yaml
+cp hack/sort-manifests.yaml out/sort-manifests.yaml
 git_tag="${TRAVIS_TAG:-$(git describe --tags --dirty --always)}"
 sed -i \
   -e "s/KSORT_DARWIN_ZIP_CHECKSUM/$(cat out/ksort-darwin-amd64.zip.sha256)/g" \
   -e "s/KSORT_LINUX_ZIP_CHECKSUM/$(cat out/ksort-linux-amd64.zip.sha256)/g" \
   -e "s/KSORT_VERSION/${git_tag}/g" \
-  out/sort-by-kind.yaml
-echo "Written out/sort-by-kind.yaml" >&2
+  out/sort-manifests.yaml
+echo "Written out/sort-manifests.yaml" >&2
 # vim: ai ts=2 sw=2 et sts=2 ft=sh

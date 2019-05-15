@@ -1,7 +1,7 @@
 apiVersion: krew.googlecontainertools.github.com/v1alpha2
 kind: Plugin
 metadata:
-  name: sort-by-kind
+  name: sort-manifests
 spec:
   version: KSORT_VERSION
   shortDescription: Sort manfest files in a proper order by Kind

@@ -33,9 +33,26 @@ $ ksort ./app.yaml
 
 ## Installation
 
+You can download an archive file from [GitHub Releases](https://github.com/superbrothers/ksort/releases), then extract it and install a binary.
+
+Or use `go get` as follows:
+
 ```
-$ go get github.com/superbrothers/ksort/cmd
+$ GO111MODULE=on go get github.com/superbrothers/ksort/cmd
 ```
+
+## Installation as kubectl plugin
+
+You can also use ksort as kubectl plugin. The name as kubectl plugin is `sort-manifests`.
+
+1. Install [krew](https://github.com/GoogleContainerTools/krew) that is a plugin manager for kubectl
+2. Run:
+
+        kubectl krew install sort-manifests
+
+3. Try it out
+
+        kubectl sort-manifests -h
 
 ## License
 
