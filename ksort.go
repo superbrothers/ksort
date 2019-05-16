@@ -11,7 +11,6 @@ import (
 	"errors"
 	"flag"
 	"fmt"
-	"io"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -19,6 +18,8 @@ import (
 	"strings"
 
 	"github.com/spf13/cobra"
+	"k8s.io/cli-runtime/pkg/genericclioptions"
+	"k8s.io/cli-runtime/pkg/genericclioptions/resource"
 	util "k8s.io/helm/pkg/releaseutil"
 	"k8s.io/helm/pkg/tiller"
 	"k8s.io/klog"
@@ -36,40 +37,56 @@ ksort sorts manfest files in a proper order by Kind, which is implementd by
 using SortByKind function in Kubernetes Helm.`
 
 	ksortExample = `  # Sort manifest files under the manifests directory, and output the result to the stdout.
-  ksort ./manifests
+  ksort -f ./manifests
 
   # To pass the result into the stdin of kubectl apply command is also convenient.
-  ksort ./manifests | kubectl apply -f -
+  ksort -f ./manifests | kubectl apply -f -
 
   # Sort manifests contained the manifest file.
-  ksort app.yaml
+  ksort -f app.yaml
   
   # Sort manifests in uninstall order.
-  ksort ./manifests --delete`
+  ksort -f ./manifests --delete`
 
 	kindUnknown = "Unknown"
 )
 
 type options struct {
-	filenames []string
-	delete    bool
+	filenameFlags *genericclioptions.FileNameFlags
+
+	filenameOptions resource.FilenameOptions
+	delete          bool
+
+	genericclioptions.IOStreams
 }
 
-func init() {
-	flag.Set("logtostderr", "true")
+func newOptions(streams genericclioptions.IOStreams) *options {
+	usage := "Containing the resource to sort in a proper order by Kind"
+
+	filenames := []string{}
+	recursive := false
+
+	return &options{
+		filenameFlags: &genericclioptions.FileNameFlags{
+			Usage:     usage,
+			Filenames: &filenames,
+			Recursive: &recursive,
+		},
+		IOStreams: streams,
+	}
 }
 
-func NewCommand(in io.Reader, out, errOut io.Writer) *cobra.Command {
-	o := options{}
+func NewCommand(streams genericclioptions.IOStreams) *cobra.Command {
+	o := newOptions(streams)
 
 	cmd := &cobra.Command{
-		Use:     "ksort FILENAME...",
+		Use:     "ksort -f FILENAME",
 		Short:   "ksort sorts manfest files in a proper order by Kind.",
 		Long:    ksortLong,
 		Example: ksortExample,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if printVersion {
-				fmt.Fprintf(errOut, "%#v\n", newInfo())
+				fmt.Fprintf(o.ErrOut, "%#v\n", newInfo())
 				return nil
 			}
 
@@ -77,14 +94,18 @@ func NewCommand(in io.Reader, out, errOut io.Writer) *cobra.Command {
 				return err
 			}
 
+			if err := o.validate(); err != nil {
+				return err
+			}
+
 			cmd.SilenceUsage = true
 
-			return o.run(out)
+			return o.run()
 		},
 	}
 
-	cmd.SetOutput(errOut)
-
+	o.filenameFlags.AddFlags(cmd.Flags())
+	cmd.MarkFlagRequired("filename")
 	cmd.Flags().BoolVarP(&o.delete, "delete", "d", o.delete, "Sort manifests in uninstall order")
 	cmd.Flags().BoolVar(&printVersion, "version", printVersion, "Print the version and exit")
 	cmd.Flags().AddGoFlagSet(flag.CommandLine)
@@ -97,26 +118,23 @@ func NewCommand(in io.Reader, out, errOut io.Writer) *cobra.Command {
 }
 
 func (o *options) complete(cmd *cobra.Command, args []string) error {
-	if len(args) == 0 {
-		return errors.New("filename is required")
-	}
-
-	// verify manifest file exists
-	for _, filename := range args {
-		if _, err := os.Stat(filename); err != nil {
-			return err
-		}
-	}
-
-	o.filenames = args
+	o.filenameOptions = o.filenameFlags.ToOptions()
 
 	return nil
 }
 
-func (o *options) run(out io.Writer) error {
+func (o *options) validate() error {
+	if len(o.filenameOptions.Filenames) == 0 {
+		return errors.New("Must specify --filename")
+	}
+
+	return nil
+}
+
+func (o *options) run() error {
 	contents := map[string]string{}
 
-	for _, filename := range o.filenames {
+	for _, filename := range o.filenameOptions.Filenames {
 		klog.V(2).Infof("Walking the file tree rooted at %q", filename)
 
 		err := filepath.Walk(filename, func(path string, info os.FileInfo, err error) error {
@@ -127,7 +145,9 @@ func (o *options) run(out io.Writer) error {
 			}
 
 			if info.IsDir() {
-				klog.V(2).Infof("Skip %q because it's directory", path)
+				if path != filename && !o.filenameOptions.Recursive {
+					return filepath.SkipDir
+				}
 				return nil
 			}
 
@@ -152,7 +172,7 @@ func (o *options) run(out io.Writer) error {
 	}
 
 	if len(contents) == 0 {
-		return errors.New("File does not exist")
+		return errors.New("There are no files")
 	}
 
 	// extract kind and name
@@ -195,7 +215,7 @@ func (o *options) run(out io.Writer) error {
 		a[i] += m.Content
 	}
 
-	fmt.Fprintln(out, strings.Join(a, "\n---\n"))
+	fmt.Fprintln(o.Out, strings.Join(a, "\n---\n"))
 
 	return nil
 }
