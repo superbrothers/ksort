@@ -17,18 +17,18 @@ Sort manifest files in the `deploy` directory in the proper order, and output th
 ```
 $ ls ./manifests
 deployment.yaml  ingress.yaml  namespace.yaml  service.yaml
-$ ksort ./manifests
+$ ksort -f ./manifests
 ```
 
 To pass the result into the stdin of `kubectl apply` command is also convenient.
 
 ```
-$ ksort ./manifests | kubectl apply -f -
+$ ksort -f ./manifests | kubectl apply -f -
 ```
 
 Sort manifests contained the manifest file that is specified.
 ```
-$ ksort ./app.yaml
+$ ksort -f ./app.yaml
 ```
 
 ## Installation

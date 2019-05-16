@@ -8,13 +8,20 @@ file that was distributed with this source code.
 package main
 
 import (
+	"flag"
 	"os"
 
 	"github.com/superbrothers/ksort"
+	"k8s.io/cli-runtime/pkg/genericclioptions"
 )
 
+func init() {
+	flag.Set("logtostderr", "true")
+}
+
 func main() {
-	cmd := ksort.NewCommand(os.Stdin, os.Stdout, os.Stderr)
+	streams := genericclioptions.IOStreams{In: os.Stdin, Out: os.Stdout, ErrOut: os.Stderr}
+	cmd := ksort.NewCommand(streams)
 	if err := cmd.Execute(); err != nil {
 		os.Exit(1)
 	}

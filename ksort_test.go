@@ -1,9 +1,9 @@
 package ksort
 
 import (
-	"bytes"
-	"io/ioutil"
 	"testing"
+
+	"k8s.io/cli-runtime/pkg/genericclioptions"
 )
 
 func TestCommand(t *testing.T) {
@@ -12,7 +12,7 @@ func TestCommand(t *testing.T) {
 		out  string
 	}{
 		{
-			args: []string{"testdata/rbac.yaml"},
+			args: []string{"--filename", "testdata/rbac.yaml"},
 			out: `# Source: testdata/rbac.yaml
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
@@ -39,7 +39,7 @@ metadata:
 `,
 		},
 		{
-			args: []string{"testdata"},
+			args: []string{"--filename", "testdata"},
 			out: `# Source: testdata/configmap.yaml
 apiVersion: v1
 kind: ConfigMap
@@ -78,7 +78,7 @@ metadata:
 `,
 		},
 		{
-			args: []string{"testdata/deployment.yaml", "testdata/rbac.yaml"},
+			args: []string{"--filename", "testdata/deployment.yaml", "--filename", "testdata/rbac.yaml"},
 			out: `# Source: testdata/rbac.yaml
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
@@ -111,7 +111,7 @@ metadata:
 `,
 		},
 		{
-			args: []string{"testdata/deployment.yaml", "testdata/rbac.yaml", "--delete"},
+			args: []string{"--filename", "testdata/deployment.yaml", "--filename", "testdata/rbac.yaml", "--delete"},
 			out: `# Source: testdata/deployment.yaml
 apiVersion: apps/v1
 kind: Deployment
@@ -143,11 +143,56 @@ metadata:
   name: ClusterRole
 `,
 		},
+		{
+			args: []string{"--recursive", "--filename", "testdata"},
+			out: `# Source: testdata/test-recursive/ns.yaml
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: test-recursive
+---
+# Source: testdata/configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: configmap
+---
+# Source: testdata/rbac.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: ClusterRole
+---
+# Source: testdata/rbac.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: ClusterRoleBinding
+---
+# Source: testdata/rbac.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: Role
+---
+# Source: testdata/rbac.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: RoleBinding
+---
+# Source: testdata/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deployment
+`,
+		},
 	}
 
 	for i, tt := range tests {
-		out := &bytes.Buffer{}
-		cmd := NewCommand(bytes.NewReader(nil), out, ioutil.Discard)
+		streams, _, out, _ := genericclioptions.NewTestIOStreams()
+		cmd := NewCommand(streams)
 		cmd.SetArgs(tt.args)
 
 		if err := cmd.Execute(); err != nil {

@@ -51,12 +51,12 @@ require (
 	gopkg.in/square/go-jose.v2 v2.3.1 // indirect
 	k8s.io/apiextensions-apiserver v0.0.0-20190426053235-842c4571cde0 // indirect
 	k8s.io/apiserver v0.0.0-20190426133039-accf7b6d6716 // indirect
-	k8s.io/cli-runtime v0.0.0-20190425173743-daa7a1d0e123 // indirect
+	k8s.io/cli-runtime v0.0.0-20190425173743-daa7a1d0e123
 	k8s.io/cloud-provider v0.0.0-20190425174118-0a4f4cbb5a66 // indirect
 	k8s.io/helm v2.13.1+incompatible
 	k8s.io/klog v0.3.0
 	k8s.io/kube-openapi v0.0.0-20190426233423-c5d3b0f4bee0 // indirect
-	k8s.io/kubernetes v0.0.0-00010101000000-000000000000 // indirect
+	k8s.io/kubernetes v0.0.0-00010101000000-000000000000
 	k8s.io/utils v0.0.0-20190308190857-21c4ce38f2a7 // indirect
 	sigs.k8s.io/kustomize v2.0.3+incompatible // indirect
 	sigs.k8s.io/yaml v1.1.0 // indirect
