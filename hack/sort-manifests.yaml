@@ -10,7 +10,7 @@ spec:
     For example, Namespace object must be in the first place when installing
     them.
 
-    ksort sorts manfest files in a proper order by Kind, which is implementd by
+    ksort sorts manifest files in a proper order by Kind, which is implementd by
     using tiller.SortByKind() in Kubernetes Helm.
   homepage: https://github.com/superbrothers/ksort
   platforms:
