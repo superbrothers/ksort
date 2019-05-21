@@ -34,7 +34,9 @@ require (
 	github.com/howeyc/gopass v0.0.0-20170109162249-bf9dde6d0d2c // indirect
 	github.com/huandu/xstrings v1.2.0 // indirect
 	github.com/imdario/mergo v0.3.7 // indirect
+	github.com/jmoiron/sqlx v1.2.0 // indirect
 	github.com/json-iterator/go v1.1.6 // indirect
+	github.com/lib/pq v1.1.1 // indirect
 	github.com/liggitt/tabwriter v0.0.0-20181228230101-89fcab3d43de // indirect
 	github.com/mitchellh/go-wordwrap v1.0.0 // indirect
 	github.com/opencontainers/go-digest v1.0.0-rc1 // indirect
@@ -42,18 +44,20 @@ require (
 	github.com/peterbourgon/diskv v2.0.1+incompatible // indirect
 	github.com/pkg/errors v0.8.1 // indirect
 	github.com/prometheus/client_golang v0.9.2 // indirect
+	github.com/rubenv/sql-migrate v0.0.0-20190327083759-54bad0a9b051 // indirect
 	github.com/spf13/cobra v0.0.4-0.20190321000552-67fc4837d267
 	github.com/technosophos/moniker v0.0.0-20180509230615-a5dbd03a2245 // indirect
 	golang.org/x/net v0.0.0-20190424112056-4829fb13d2c6 // indirect
 	golang.org/x/time v0.0.0-20190308202827-9d24e82272b4 // indirect
 	google.golang.org/grpc v1.20.1 // indirect
+	gopkg.in/gorp.v1 v1.7.2 // indirect
 	gopkg.in/inf.v0 v0.9.1 // indirect
 	gopkg.in/square/go-jose.v2 v2.3.1 // indirect
 	k8s.io/apiextensions-apiserver v0.0.0-20190426053235-842c4571cde0 // indirect
 	k8s.io/apiserver v0.0.0-20190426133039-accf7b6d6716 // indirect
 	k8s.io/cli-runtime v0.0.0-20190425173743-daa7a1d0e123
 	k8s.io/cloud-provider v0.0.0-20190425174118-0a4f4cbb5a66 // indirect
-	k8s.io/helm v2.13.1+incompatible
+	k8s.io/helm v2.14.0+incompatible
 	k8s.io/klog v0.3.0
 	k8s.io/kube-openapi v0.0.0-20190426233423-c5d3b0f4bee0 // indirect
 	k8s.io/kubernetes v0.0.0-00010101000000-000000000000
@@ -64,11 +68,11 @@ require (
 )
 
 replace (
-	k8s.io/api => k8s.io/api v0.0.0-20190222213804-5cb15d344471
-	k8s.io/apiextensions-apiserver => k8s.io/apiextensions-apiserver v0.0.0-20190221221350-bfb440be4b87
-	k8s.io/apimachinery => k8s.io/apimachinery v0.0.0-20190221213512-86fb29eff628
-	k8s.io/apiserver => k8s.io/apiserver v0.0.0-20190319190228-a4358799e4fe
-	k8s.io/cli-runtime => k8s.io/cli-runtime v0.0.0-20190221221947-d8fee89e76ca
-	k8s.io/client-go => k8s.io/client-go v10.0.0+incompatible
-	k8s.io/kubernetes => k8s.io/kubernetes v1.13.6-beta.0.0.20190426170028-a3d8a90f5e46
+	k8s.io/api => k8s.io/api v0.0.0-20190409021203-6e4e0e4f393b
+	k8s.io/apiextensions-apiserver => k8s.io/apiextensions-apiserver v0.0.0-20190409022649-727a075fdec8
+	k8s.io/apimachinery => k8s.io/apimachinery v0.0.0-20190404173353-6a84e37a896d
+	k8s.io/apiserver => k8s.io/apiserver v0.0.0-20190409021813-1ec86e4da56c
+	k8s.io/cli-runtime => k8s.io/cli-runtime v0.0.0-20190409023024-d644b00f3b79
+	k8s.io/client-go => k8s.io/client-go v11.0.1-0.20190409021438-1a26190bd76a+incompatible
+	k8s.io/kubernetes => k8s.io/kubernetes v1.14.1
 )
