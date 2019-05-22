@@ -1,10 +1,25 @@
 package ksort
 
 import (
+	"strings"
 	"testing"
 
 	"k8s.io/cli-runtime/pkg/genericclioptions"
 )
+
+func TestPrintVersionInformation(t *testing.T) {
+	streams, _, _, errOut := genericclioptions.NewTestIOStreams()
+	cmd := NewCommand(streams)
+	cmd.SetArgs([]string{"--version"})
+
+	if err := cmd.Execute(); err != nil {
+		t.Errorf("cmd.Execute() => %q", err)
+	}
+
+	if !strings.Contains(errOut.String(), "&ksort.info{") {
+		t.Errorf("expect to include version information, but got %q", errOut)
+	}
+}
 
 func TestCommand(t *testing.T) {
 	tests := []struct {

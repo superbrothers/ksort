@@ -25,10 +25,6 @@ import (
 	"k8s.io/klog"
 )
 
-var (
-	printVersion = false
-)
-
 const (
 	ksortLong = `When installing manifests, they should be sorted in a proper order by Kind.
 For example, Namespace object must be in the first place when installing them.
@@ -79,6 +75,8 @@ func newOptions(streams genericclioptions.IOStreams) *options {
 func NewCommand(streams genericclioptions.IOStreams) *cobra.Command {
 	o := newOptions(streams)
 
+	printVersion := false
+
 	cmd := &cobra.Command{
 		Use:     "ksort -f FILENAME",
 		Short:   "ksort sorts manfest files in a proper order by Kind.",
@@ -105,7 +103,6 @@ func NewCommand(streams genericclioptions.IOStreams) *cobra.Command {
 	}
 
 	o.filenameFlags.AddFlags(cmd.Flags())
-	cmd.MarkFlagRequired("filename")
 	cmd.Flags().BoolVarP(&o.delete, "delete", "d", o.delete, "Sort manifests in uninstall order")
 	cmd.Flags().BoolVar(&printVersion, "version", printVersion, "Print the version and exit")
 	cmd.Flags().AddGoFlagSet(flag.CommandLine)
