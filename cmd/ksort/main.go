@@ -13,9 +13,11 @@ import (
 
 	"github.com/superbrothers/ksort"
 	"k8s.io/cli-runtime/pkg/genericclioptions"
+	"k8s.io/klog"
 )
 
 func init() {
+	klog.InitFlags(flag.CommandLine)
 	flag.Set("logtostderr", "true")
 }
 
