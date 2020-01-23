@@ -8,6 +8,7 @@ file that was distributed with this source code.
 package ksort
 
 import (
+	"bufio"
 	"errors"
 	"flag"
 	"fmt"
@@ -40,9 +41,12 @@ using SortByKind function in Kubernetes Helm.`
 
   # Sort manifests contained the manifest file.
   ksort -f app.yaml
-  
+
   # Sort manifests in uninstall order.
-  ksort -f ./manifests --delete`
+  ksort -f ./manifests --delete
+
+  # Sort manifests passed into stdin.
+  cat app.yaml | ksort -f -`
 
 	kindUnknown = "Unknown"
 )
@@ -132,6 +136,18 @@ func (o *options) run() error {
 	contents := map[string]string{}
 
 	for _, filename := range o.filenameOptions.Filenames {
+		if filename == "-" {
+			klog.V(2).Infof("Reading manifest from the standard input")
+
+			var lines []string
+			scanner := bufio.NewScanner(o.In)
+			for scanner.Scan() {
+				lines = append(lines, scanner.Text())
+			}
+			contents[""] = strings.Join(lines, "\n")
+			continue
+		}
+
 		klog.V(2).Infof("Walking the file tree rooted at %q", filename)
 
 		err := filepath.Walk(filename, func(path string, info os.FileInfo, err error) error {
@@ -202,7 +218,10 @@ func (o *options) run() error {
 			i = len(manifests) - (i + 1)
 		}
 
-		a[i] += fmt.Sprintf("# Source: %s\n", m.Name)
+		// If manifest data is read from stdin, m.Name is empty
+		if m.Name != "" {
+			a[i] += fmt.Sprintf("# Source: %s\n", m.Name)
+		}
 
 		if m.Head.Kind == kindUnknown {
 			a[i] += "# WARNING: It looks like that this file is not a manifest file\n"
