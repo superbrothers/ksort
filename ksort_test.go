@@ -24,10 +24,12 @@ func TestPrintVersionInformation(t *testing.T) {
 func TestCommand(t *testing.T) {
 	tests := []struct {
 		args []string
+		in   string
 		out  string
 	}{
 		{
 			args: []string{"--filename", "testdata/rbac.yaml"},
+			in:   "",
 			out: `# Source: testdata/rbac.yaml
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
@@ -55,6 +57,7 @@ metadata:
 		},
 		{
 			args: []string{"--filename", "testdata"},
+			in:   "",
 			out: `# Source: testdata/configmap.yaml
 apiVersion: v1
 kind: ConfigMap
@@ -94,6 +97,7 @@ metadata:
 		},
 		{
 			args: []string{"--filename", "testdata/deployment.yaml", "--filename", "testdata/rbac.yaml"},
+			in:   "",
 			out: `# Source: testdata/rbac.yaml
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
@@ -160,6 +164,7 @@ metadata:
 		},
 		{
 			args: []string{"--recursive", "--filename", "testdata"},
+			in:   "",
 			out: `# Source: testdata/test-recursive/ns.yaml
 apiVersion: v1
 kind: Namespace
@@ -203,10 +208,34 @@ metadata:
   name: deployment
 `,
 		},
+		{
+			args: []string{"--filename", "-"},
+			in: `apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: ClusterRoleBinding
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: ClusterRole
+`,
+			out: `apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: ClusterRole
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: ClusterRoleBinding
+`,
+		},
 	}
 
 	for i, tt := range tests {
-		streams, _, out, _ := genericclioptions.NewTestIOStreams()
+		streams, in, out, _ := genericclioptions.NewTestIOStreams()
+		in.WriteString(tt.in)
 		cmd := NewCommand(streams)
 		cmd.SetArgs(tt.args)
 

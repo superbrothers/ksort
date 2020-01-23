@@ -31,6 +31,11 @@ Sort manifests contained the manifest file that is specified.
 $ ksort -f ./app.yaml
 ```
 
+Sort manifests passed into stdin.
+```
+$ cat app.yaml | ksort -f-
+```
+
 ## Installation
 
 You can download an archive file from [GitHub Releases](https://github.com/superbrothers/ksort/releases), then extract it and install a binary.
