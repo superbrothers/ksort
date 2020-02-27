@@ -1,9 +1,7 @@
 sudo: false
 language: go
 go:
-- '1.12'
-env:
-- GO111MODULE=on
+- '1.13'
 before_install:
 - go get github.com/mitchellh/gox
 script:

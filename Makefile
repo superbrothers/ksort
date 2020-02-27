@@ -12,7 +12,7 @@ archives:
 
 .PHONY: test
 test:
-		GO111MODULE=on go test -v ./...
+		go test -v ./...
 
 .PHONY: test-archive
 test-archive:
