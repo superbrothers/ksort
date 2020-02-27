@@ -13,21 +13,27 @@ if [[ ! -d "${bin_dir}" ]]; then
     exit 1
 fi
 
+# Create archive files in zip and tar.gz format for each arch
 for osarch in $(ls "$bin_dir"); do
-  archive_file="out/ksort-${osarch}.zip"
-  echo "Creating ${archive_file}" >&2
-  ( \
-    cd "${bin_dir}/${osarch}/" && \
-    cp ../../../LICENSE.txt . && \
-    cp ../../../README.md . && \
-    zip -r "../../../${archive_file}" * \
-  )
+  for format in zip tar.gz; do
+    archive_file="out/ksort-${osarch}.${format}"
+    echo "Creating ${archive_file}" >&2
+    ( \
+      cd "${bin_dir}/${osarch}/" && \
+      cp ../../../LICENSE.txt . && \
+      cp ../../../README.md . && \
+      [[ "$format" == "zip" ]] && \
+        zip -r "../../../${archive_file}" * \
+      || \
+        tar zcvf "../../../${archive_file}" * \
+    )
 
-  tar_sumfile="${archive_file}.sha256"
-  tar_checksum="$(shasum -a 256 "$archive_file" | awk '{print $1}')"
-  echo "${archive_file}: checksum: ${tar_checksum}" >&2
-  echo "$tar_checksum" >"${tar_sumfile}"
-  echo "Written ${tar_sumfile}"
+    archive_sumfile="${archive_file}.sha256"
+    archive_checksum="$(shasum -a 256 "$archive_file" | awk '{print $1}')"
+    echo "${archive_file}: checksum: ${archive_checksum}" >&2
+    echo "$archive_checksum" >"${archive_sumfile}"
+    echo "Written ${archive_sumfile}"
+  done
 done
 
 # Copy and process ksort manifest
