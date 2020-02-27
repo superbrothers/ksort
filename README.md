@@ -43,7 +43,7 @@ You can download an archive file from [GitHub Releases](https://github.com/super
 Or use `go get` as follows:
 
 ```
-$ GO111MODULE=on go get github.com/superbrothers/ksort/cmd
+$ go get github.com/superbrothers/ksort/cmd
 ```
 
 ## Installation as kubectl plugin
