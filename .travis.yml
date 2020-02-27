@@ -17,6 +17,8 @@ deploy:
   file:
   - "out/*.zip"
   - "out/*.zip.sha256"
+  - "out/*.tar.gz"
+  - "out/*.tar.gz.sha256"
   - "out/sort-manifests.yaml"
   skip_cleanup: true
   on:
