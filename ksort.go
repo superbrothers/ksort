@@ -19,10 +19,9 @@ import (
 	"strings"
 
 	"github.com/spf13/cobra"
+	"helm.sh/helm/v3/pkg/releaseutil"
 	"k8s.io/cli-runtime/pkg/genericclioptions"
 	"k8s.io/cli-runtime/pkg/resource"
-	util "k8s.io/helm/pkg/releaseutil"
-	"k8s.io/helm/pkg/tiller"
 	"k8s.io/klog"
 )
 
@@ -192,7 +191,7 @@ func (o *options) run() error {
 	re := regexp.MustCompile("kind:(.*)\n")
 	// YAML separator
 	sep := regexp.MustCompile("(?m)^---.*$")
-	manifests := []tiller.Manifest{}
+	manifests := []releaseutil.Manifest{}
 	for k, v := range contents {
 		docs := sep.Split(v, -1)
 		for _, doc := range docs {
@@ -205,19 +204,22 @@ func (o *options) run() error {
 				h = strings.TrimSpace(match[1])
 			}
 			doc = strings.Trim(doc, "\n")
-			m := tiller.Manifest{Name: k, Content: doc, Head: &util.SimpleHead{Kind: h}}
+			m := releaseutil.Manifest{Name: k, Content: doc, Head: &releaseutil.SimpleHead{Kind: h}}
 			manifests = append(manifests, m)
 			klog.V(2).Infof("Found %s in %q", h, k)
 		}
 	}
 	klog.V(2).Infof("Found %d objects in total", len(manifests))
 
-	a := make([]string, len(manifests))
-	for i, m := range tiller.SortByKind(manifests) {
-		if o.delete {
-			i = len(manifests) - (i + 1)
-		}
+	var sortOrder KindSortOrder
+	if o.delete {
+		sortOrder = UninstallOrder
+	} else {
+		sortOrder = InstallOrder
+	}
 
+	a := make([]string, len(manifests))
+	for i, m := range sortByKind(manifests, sortOrder) {
 		// If manifest data is read from stdin, m.Name is empty
 		if m.Name != "" {
 			a[i] += fmt.Sprintf("# Source: %s\n", m.Name)

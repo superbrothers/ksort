@@ -8,7 +8,7 @@ This is a tool which does in-place sort of Kubernetes manifests by Kind.
 
 When installing manifests, they should be sorted in a proper order by Kind. For example, Namespace object must be in the first place when installing them.
 
-ksort sorts manfest files in a proper order by Kind, which is implementd by using `tiller.SortByKind()` in Kubernetes Helm.
+ksort sorts manfest files in a proper order by Kind.
 
 ## Usage
 
@@ -43,7 +43,7 @@ You can download an archive file from [GitHub Releases](https://github.com/super
 Or use `go get` as follows:
 
 ```
-$ GO111MODULE=on go get github.com/superbrothers/ksort/cmd
+$ go get github.com/superbrothers/ksort/cmd
 ```
 
 ## Installation as kubectl plugin
