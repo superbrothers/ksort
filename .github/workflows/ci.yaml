@@ -1,0 +1,29 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+    paths_ignore: ["**.md"]
+  pull_request:
+    paths_ignore: ["**.md"]
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/setup-go@v2-beta
+      with:
+        go-version: "1.13"
+    - uses: superbrothers/setup-ga@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Setup gox
+      run: |
+        go get github.com/mitchellh/gox
+        ga add-path "$(go env GOPATH)/bin"
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+    - run: make test
+    - run: make archives
+    - run: make test-archive
