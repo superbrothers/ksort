@@ -22,7 +22,7 @@ import (
 	"helm.sh/helm/v3/pkg/releaseutil"
 	"k8s.io/cli-runtime/pkg/genericclioptions"
 	"k8s.io/cli-runtime/pkg/resource"
-	"k8s.io/klog"
+	"k8s.io/klog/v2"
 )
 
 const (
