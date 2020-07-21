@@ -38,3 +38,15 @@ spec:
       matchLabels:
         os: linux
         arch: amd64
+  - uri: https://github.com/superbrothers/ksort/releases/download/KSORT_VERSION/ksort-windows-amd64.zip
+    sha256: KSORT_WINDOWS_ZIP_CHECKSUM
+    bin: ksort.exe
+    files:
+    - from: ksort.exe
+      to: .
+    - from: LICENSE.txt
+      to: .
+    selector:
+      matchLabels:
+        os: windows
+        arch: amd64

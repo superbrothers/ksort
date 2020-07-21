@@ -7,7 +7,7 @@ set -e -o pipefail
 SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd "${SCRIPTDIR}/.."
 
-DEFAULT_OSARCH="darwin/amd64 linux/amd64"
+DEFAULT_OSARCH="darwin/amd64 linux/amd64 windows/amd64"
 version_pkg="github.com/superbrothers/ksort"
 
 rm -rf out/

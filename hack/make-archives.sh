@@ -42,6 +42,7 @@ git_tag="${TRAVIS_TAG:-$(git describe --tags --dirty --always)}"
 sed -i \
   -e "s/KSORT_DARWIN_ZIP_CHECKSUM/$(cat out/ksort-darwin-amd64.zip.sha256)/g" \
   -e "s/KSORT_LINUX_ZIP_CHECKSUM/$(cat out/ksort-linux-amd64.zip.sha256)/g" \
+  -e "s/KSORT_WINDOWS_ZIP_CHECKSUM/$(cat out/ksort-windows-amd64.zip.sha256)/g" \
   -e "s/KSORT_VERSION/${git_tag}/g" \
   out/sort-manifests.yaml
 echo "Written out/sort-manifests.yaml" >&2
