@@ -72,4 +72,4 @@ jobs:
         title: Bump the version of sort-manifests to ${{ env.GIT_TAG }}
         body: This PR bumps up the version of sort-manifests to ${{ env.GIT_TAG }}.
         branch: sort-manifests-${{ env.GIT_TAG }}
-        equest-to-parent: true
+        request-to-parent: true
