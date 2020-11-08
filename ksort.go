@@ -112,7 +112,7 @@ func NewCommand(streams genericclioptions.IOStreams) *cobra.Command {
 
 	// Workaround for this issue:
 	// https://github.com/kubernetes/kubernetes/issues/17162
-	flag.CommandLine.Parse([]string{})
+	_ = flag.CommandLine.Parse([]string{})
 
 	return cmd
 }
