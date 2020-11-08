@@ -30,7 +30,7 @@ const (
 For example, Namespace object must be in the first place when installing them.
 
 ksort sorts manfest files in a proper order by Kind, which is implementd by
-using SortByKind function in Kubernetes Helm.`
+using sortManifestsByKind function in Kubernetes Helm.`
 
 	ksortExample = `  # Sort manifest files under the manifests directory, and output the result to the stdout.
   ksort -f ./manifests
@@ -219,7 +219,7 @@ func (o *options) run() error {
 	}
 
 	a := make([]string, len(manifests))
-	for i, m := range sortByKind(manifests, sortOrder) {
+	for i, m := range sortManifestsByKind(manifests, sortOrder) {
 		// If manifest data is read from stdin, m.Name is empty
 		if m.Name != "" {
 			a[i] += fmt.Sprintf("# Source: %s\n", m.Name)

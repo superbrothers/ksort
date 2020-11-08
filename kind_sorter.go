@@ -35,6 +35,7 @@ var InstallOrder KindSortOrder = []string{
 	"PodDisruptionBudget",
 	"ServiceAccount",
 	"Secret",
+	"SecretList",
 	"ConfigMap",
 	"StorageClass",
 	"PersistentVolume",
@@ -91,6 +92,7 @@ var UninstallOrder KindSortOrder = []string{
 	"PersistentVolume",
 	"StorageClass",
 	"ConfigMap",
+	"SecretList",
 	"Secret",
 	"ServiceAccount",
 	"PodDisruptionBudget",
@@ -101,46 +103,32 @@ var UninstallOrder KindSortOrder = []string{
 	"Namespace",
 }
 
-// sortByKind does an in-place sort of manifests by Kind.
+// sort manifests by kind.
 //
 // Results are sorted by 'ordering', keeping order of items with equal kind/priority
-func sortByKind(manifests []releaseutil.Manifest, ordering KindSortOrder) []releaseutil.Manifest {
-	ks := newKindSorter(manifests, ordering)
-	sort.Stable(ks)
-	return ks.manifests
+func sortManifestsByKind(manifests []releaseutil.Manifest, ordering KindSortOrder) []releaseutil.Manifest {
+	sort.SliceStable(manifests, func(i, j int) bool {
+		return lessByKind(manifests[i], manifests[j], manifests[i].Head.Kind, manifests[j].Head.Kind, ordering)
+	})
+
+	return manifests
 }
 
-type kindSorter struct {
-	ordering  map[string]int
-	manifests []releaseutil.Manifest
-}
-
-func newKindSorter(m []releaseutil.Manifest, s KindSortOrder) *kindSorter {
-	o := make(map[string]int, len(s))
-	for v, k := range s {
-		o[k] = v
+func lessByKind(a interface{}, b interface{}, kindA string, kindB string, o KindSortOrder) bool {
+	ordering := make(map[string]int, len(o))
+	for v, k := range o {
+		ordering[k] = v
 	}
 
-	return &kindSorter{
-		manifests: m,
-		ordering:  o,
-	}
-}
+	first, aok := ordering[kindA]
+	second, bok := ordering[kindB]
 
-func (k *kindSorter) Len() int { return len(k.manifests) }
-
-func (k *kindSorter) Swap(i, j int) { k.manifests[i], k.manifests[j] = k.manifests[j], k.manifests[i] }
-
-func (k *kindSorter) Less(i, j int) bool {
-	a := k.manifests[i]
-	b := k.manifests[j]
-	first, aok := k.ordering[a.Head.Kind]
-	second, bok := k.ordering[b.Head.Kind]
-	if first == second {
-		// if both are unknown and of different kind sort by kind alphabetically
-		if !aok && !bok && a.Head.Kind != b.Head.Kind {
-			return a.Head.Kind < b.Head.Kind
+	if !aok && !bok {
+		// if both are unknown then sort alphabetically by kind, keep original order if same kind
+		if kindA != kindB {
+			return kindA < kindB
 		}
+		return first < second
 	}
 	// unknown kind is last
 	if !aok {
