@@ -17,7 +17,9 @@ spec:
   - {{addURIAndSha "https://github.com/superbrothers/ksort/releases/download/{{ .TagName }}/ksort-darwin-amd64.zip" .TagName }}
     bin: ksort
     files:
-    - from: "*"
+    - from: ksort
+      to: .
+    - from: LICENSE.txt
       to: .
     selector:
       matchLabels:
@@ -26,16 +28,20 @@ spec:
   - {{addURIAndSha "https://github.com/superbrothers/ksort/releases/download/{{ .TagName }}/ksort-linux-amd64.zip" .TagName }}
     bin: ksort
     files:
-    - from: "*"
+    - from: ksort
+      to: .
+    - from: LICENSE.txt
       to: .
     selector:
       matchLabels:
         os: linux
         arch: amd64
   - {{addURIAndSha "https://github.com/superbrothers/ksort/releases/download/{{ .TagName }}/ksort-windows-amd64.zip" .TagName }}
-    bin: ksort
+    bin: ksort.exe
     files:
-    - from: "*"
+    - from: ksort.exe
+      to: .
+    - from: LICENSE.txt
       to: .
     selector:
       matchLabels:
