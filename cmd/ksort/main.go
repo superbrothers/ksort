@@ -8,7 +8,6 @@ file that was distributed with this source code.
 package main
 
 import (
-	"flag"
 	"os"
 
 	"github.com/superbrothers/ksort"
@@ -16,12 +15,10 @@ import (
 	"k8s.io/klog/v2"
 )
 
-func init() {
-	klog.InitFlags(flag.CommandLine)
-	_ = flag.Set("logtostderr", "true")
-}
-
 func main() {
+	klog.InitFlags(nil)
+	defer klog.Flush()
+
 	streams := genericclioptions.IOStreams{In: os.Stdin, Out: os.Stdout, ErrOut: os.Stderr}
 	cmd := ksort.NewCommand(streams)
 	if err := cmd.Execute(); err != nil {

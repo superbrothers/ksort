@@ -110,10 +110,6 @@ func NewCommand(streams genericclioptions.IOStreams) *cobra.Command {
 	cmd.Flags().BoolVar(&printVersion, "version", printVersion, "Print the version and exit")
 	cmd.Flags().AddGoFlagSet(flag.CommandLine)
 
-	// Workaround for this issue:
-	// https://github.com/kubernetes/kubernetes/issues/17162
-	_ = flag.CommandLine.Parse([]string{})
-
 	return cmd
 }
 
