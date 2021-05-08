@@ -1,6 +1,5 @@
 env:
 - GO111MODULE=on
-- GOPROXY=https://gocenter.io
 builds:
 - main: ./cmd/ksort/main.go
   binary: ksort
