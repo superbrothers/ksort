@@ -27,3 +27,8 @@ jobs:
     - run: make lint
     - run: make test
     - run: make dist
+    - uses: superbrothers/actions/krew-plugin-test@master
+      with:
+        manifest: ./dist/sort-manifests.yaml
+        archive: ./dist/ksort-linux-amd64.zip
+        command: kubectl sort-manifests --help
