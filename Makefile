@@ -47,6 +47,10 @@ test:
 .PHONY: dist
 dist: $(GORELEASER) $(GOMPLATE)
 	$(GORELEASER) release --rm-dist --skip-publish --snapshot
+	$(MAKE) manifest
+
+.PHONY: manifest
+manifest:
 	GIT_VERSION=$(GIT_VERSION) $(GOMPLATE) -f ./hack/sort-manifests.yaml.tmpl > $(DIST_DIR)/sort-manifests.yaml
 
 .PHONY: clean
