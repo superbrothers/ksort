@@ -23,4 +23,16 @@ archives:
 checksum:
   name_template: 'checksums.txt'
 changelog:
-  sort: asc
+  skip: true
+krews:
+- name: sort-manifests
+  homepage: https://github.com/superbrothers/ksort
+  description: |
+    When installing manifests, they should be sorted in a proper order by Kind.
+    For example, Namespace object must be in the first place when installing
+    them.
+
+    ksort sorts manifest files in a proper order by Kind, which is implementd by
+    using tiller.SortByKind() in Kubernetes Helm.
+  short_description: Sort manifest files in a proper order by Kind
+  skip_upload: true
