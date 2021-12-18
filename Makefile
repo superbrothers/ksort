@@ -1,4 +1,4 @@
-GO ?= GO111MODULE=on go
+GO ?= go
 DIST_DIR := dist
 GIT_VERSION ?= $(shell ./hack/git-version.sh)
 
@@ -14,6 +14,8 @@ GOLANGCI_LINT_BIN := bin/golangci-lint
 GOLANGCI_LINT := $(TOOLS_DIR)/$(GOLANGCI_LINT_BIN)
 GOMPLATE_BIN := bin/gomplate
 GOMPLATE := $(TOOLS_DIR)/$(GOMPLATE_BIN)
+VALIDATE_KREW_MAIFEST_BIN := bin/validate-krew-manifest
+VALIDATE_KREW_MAIFEST := $(TOOLS_DIR)/$(VALIDATE_KREW_MAIFEST_BIN)
 
 $(GORELEASER): $(TOOLS_DIR)/go.mod
 	cd $(TOOLS_DIR) && $(GO) build -o $(GORELEASER_BIN) github.com/goreleaser/goreleaser
@@ -23,6 +25,9 @@ $(GOLANGCI_LINT): $(TOOLS_DIR)/go.mod
 
 $(GOMPLATE): $(TOOLS_DIR)/go.mod
 	cd $(TOOLS_DIR) && $(GO) build -o $(GOMPLATE_BIN) github.com/hairyhenderson/gomplate/v3/cmd/gomplate
+
+$(VALIDATE_KREW_MAIFEST): $(TOOLS_DIR)/go.mod
+	cd $(TOOLS_DIR) && $(GO) build -o $(VALIDATE_KREW_MAIFEST_BIN) sigs.k8s.io/krew/cmd/validate-krew-manifest
 
 .PHONY: build-cross
 build-cross: $(GORELEASER)
@@ -43,6 +48,10 @@ lint: $(GOLANGCI_LINT) vet fmt
 .PHONY: test
 test:
 	$(GO) test -v ./...
+
+.PHONY: validate-krew-manifest
+validate-krew-manifest: $(VALIDATE_KREW_MAIFEST)
+	$(VALIDATE_KREW_MAIFEST) -manifest dist/sort-manifests.yaml -skip-install
 
 .PHONY: dist
 dist: $(GORELEASER) $(GOMPLATE)
