@@ -1,10 +1,6 @@
 GO ?= go
 DIST_DIR := dist
 
-.PHONY: build
-build: $(GORELEASER)
-	$(GORELEASER) build --snapshot --rm-dist --single-target --output $(DIST_DIR)/ksort
-
 TOOLS_BIN_DIR := $(CURDIR)/hack/tools/bin
 $(shell mkdir -p $(TOOLS_BIN_DIR))
 
@@ -23,6 +19,10 @@ $(GOLANGCI_LINT):
 
 $(VALIDATE_KREW_MAIFEST):
 	GOBIN=$(TOOLS_BIN_DIR) $(GO) install sigs.k8s.io/krew/cmd/validate-krew-manifest@$(VALIDATE_KREW_MAIFEST_VERSION)
+
+.PHONY: build
+build: $(GORELEASER)
+	$(GORELEASER) build --snapshot --rm-dist --single-target --output $(DIST_DIR)/ksort
 
 .PHONY: build-cross
 build-cross: $(GORELEASER)
