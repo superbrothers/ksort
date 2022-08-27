@@ -12,7 +12,6 @@ import (
 	"errors"
 	"flag"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -164,7 +163,7 @@ func (o *options) run() error {
 				return nil
 			}
 
-			content, err := ioutil.ReadFile(path)
+			content, err := os.ReadFile(path)
 			if err != nil {
 				return fmt.Errorf("Failed to read a file %q: %v\n", path, err)
 			}
