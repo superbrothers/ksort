@@ -2,26 +2,27 @@ GO ?= go
 DIST_DIR := dist
 
 .PHONY: build
-build:
-	$(GO) build -o $(DIST_DIR)/ksort cmd/ksort/main.go
+build: $(GORELEASER)
+	$(GORELEASER) build --snapshot --rm-dist --single-target --output $(DIST_DIR)/ksort
 
-TOOLS_DIR := hack/tools
-TOOLS_BIN_DIR := $(TOOLS_DIR)/bin
-GORELEASER_BIN := bin/goreleaser
-GORELEASER := $(TOOLS_DIR)/$(GORELEASER_BIN)
-GOLANGCI_LINT_BIN := bin/golangci-lint
-GOLANGCI_LINT := $(TOOLS_DIR)/$(GOLANGCI_LINT_BIN)
-VALIDATE_KREW_MAIFEST_BIN := bin/validate-krew-manifest
-VALIDATE_KREW_MAIFEST := $(TOOLS_DIR)/$(VALIDATE_KREW_MAIFEST_BIN)
+TOOLS_BIN_DIR := $(CURDIR)/hack/tools/bin
+$(shell mkdir -p $(TOOLS_BIN_DIR))
 
-$(GORELEASER): $(TOOLS_DIR)/go.mod
-	cd $(TOOLS_DIR) && $(GO) build -o $(GORELEASER_BIN) github.com/goreleaser/goreleaser
+GORELEASER := $(TOOLS_BIN_DIR)/goreleaser
+GORELEASER_VERSION ?= v1.10.3
+GOLANGCI_LINT := $(TOOLS_BIN_DIR)/golangci-lint
+GOLANGCI_LINT_VERSION ?= v1.49.0
+VALIDATE_KREW_MAIFEST := $(TOOLS_BIN_DIR)/validate-krew-manifest
+VALIDATE_KREW_MAIFEST_VERSION ?= v0.4.3
 
-$(GOLANGCI_LINT): $(TOOLS_DIR)/go.mod
-	cd $(TOOLS_DIR) && $(GO) build -o $(GOLANGCI_LINT_BIN) github.com/golangci/golangci-lint/cmd/golangci-lint
+$(GORELEASER):
+	GOBIN=$(TOOLS_BIN_DIR) $(GO) install github.com/goreleaser/goreleaser@$(GORELEASER_VERSION)
 
-$(VALIDATE_KREW_MAIFEST): $(TOOLS_DIR)/go.mod
-	cd $(TOOLS_DIR) && $(GO) build -o $(VALIDATE_KREW_MAIFEST_BIN) sigs.k8s.io/krew/cmd/validate-krew-manifest
+$(GOLANGCI_LINT):
+	GOBIN=$(TOOLS_BIN_DIR) $(GO) install github.com/golangci/golangci-lint/cmd/golangci-lint@$(GOLANGCI_LINT_VERSION)
+
+$(VALIDATE_KREW_MAIFEST):
+	GOBIN=$(TOOLS_BIN_DIR) $(GO) install sigs.k8s.io/krew/cmd/validate-krew-manifest@$(VALIDATE_KREW_MAIFEST_VERSION)
 
 .PHONY: build-cross
 build-cross: $(GORELEASER)
