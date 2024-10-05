@@ -5,7 +5,7 @@ TOOLS_BIN_DIR := $(CURDIR)/hack/tools/bin
 $(shell mkdir -p $(TOOLS_BIN_DIR))
 
 GORELEASER := $(TOOLS_BIN_DIR)/goreleaser
-GORELEASER_VERSION ?= v1.10.3
+GORELEASER_VERSION ?= v1.26.2
 GOLANGCI_LINT := $(TOOLS_BIN_DIR)/golangci-lint
 GOLANGCI_LINT_VERSION ?= v1.49.0
 VALIDATE_KREW_MAIFEST := $(TOOLS_BIN_DIR)/validate-krew-manifest

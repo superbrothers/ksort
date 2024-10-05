@@ -54,6 +54,8 @@ type options struct {
 
 	filenameOptions resource.FilenameOptions
 	delete          bool
+	nameOnly        bool
+	alphabetical    bool
 
 	genericclioptions.IOStreams
 }
@@ -106,6 +108,8 @@ func NewCommand(streams genericclioptions.IOStreams) *cobra.Command {
 
 	o.filenameFlags.AddFlags(cmd.Flags())
 	cmd.Flags().BoolVarP(&o.delete, "delete", "d", o.delete, "Sort manifests in uninstall order")
+	cmd.Flags().BoolVarP(&o.nameOnly, "name-only", "n", o.nameOnly, "Print only the name of the sorted manifests")
+	cmd.Flags().BoolVarP(&o.alphabetical, "alphabetical", "a", o.alphabetical, "Sort manifests alphabetically within kinds")
 	cmd.Flags().BoolVar(&printVersion, "version", printVersion, "Print the version and exit")
 	cmd.Flags().AddGoFlagSet(flag.CommandLine)
 
@@ -172,7 +176,6 @@ func (o *options) run() error {
 
 			return nil
 		})
-
 		if err != nil {
 			return err
 		}
@@ -214,7 +217,7 @@ func (o *options) run() error {
 	}
 
 	a := make([]string, len(manifests))
-	for i, m := range sortManifestsByKind(manifests, sortOrder) {
+	for i, m := range sortManifestsByKind(manifests, sortOrder, o.alphabetical) {
 		// If manifest data is read from stdin, m.Name is empty
 		if m.Name != "" {
 			a[i] += fmt.Sprintf("# Source: %s\n", m.Name)
@@ -228,7 +231,13 @@ func (o *options) run() error {
 		a[i] += m.Content
 	}
 
-	fmt.Fprintln(o.Out, strings.Join(a, "\n---\n"))
+	if o.nameOnly {
+		for _, m := range sortManifestsByKind(manifests, sortOrder, o.alphabetical) {
+			fmt.Println(m.Name)
+		}
+	} else {
+		fmt.Fprintln(o.Out, strings.Join(a, "\n---\n"))
+	}
 
 	return nil
 }

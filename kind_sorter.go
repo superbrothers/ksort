@@ -1,10 +1,13 @@
 // Forked from helm.sh/helm/v3/pkg/releaseutil/kind_sorter.go
 /*
 Copyright The Helm Authors.
+
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
+
     http://www.apache.org/licenses/LICENSE-2.0
+
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -27,6 +30,7 @@ type KindSortOrder []string
 //
 // Those occurring earlier in the list get installed before those occurring later in the list.
 var InstallOrder KindSortOrder = []string{
+	"PriorityClass",
 	"Namespace",
 	"NetworkPolicy",
 	"ResourceQuota",
@@ -59,6 +63,7 @@ var InstallOrder KindSortOrder = []string{
 	"StatefulSet",
 	"Job",
 	"CronJob",
+	"IngressClass",
 	"Ingress",
 	"APIService",
 }
@@ -69,6 +74,7 @@ var InstallOrder KindSortOrder = []string{
 var UninstallOrder KindSortOrder = []string{
 	"APIService",
 	"Ingress",
+	"IngressClass",
 	"Service",
 	"CronJob",
 	"Job",
@@ -101,20 +107,21 @@ var UninstallOrder KindSortOrder = []string{
 	"ResourceQuota",
 	"NetworkPolicy",
 	"Namespace",
+	"PriorityClass",
 }
 
 // sort manifests by kind.
 //
 // Results are sorted by 'ordering', keeping order of items with equal kind/priority
-func sortManifestsByKind(manifests []releaseutil.Manifest, ordering KindSortOrder) []releaseutil.Manifest {
+func sortManifestsByKind(manifests []releaseutil.Manifest, ordering KindSortOrder, alphabetical bool) []releaseutil.Manifest {
 	sort.SliceStable(manifests, func(i, j int) bool {
-		return lessByKind(manifests[i], manifests[j], manifests[i].Head.Kind, manifests[j].Head.Kind, ordering)
+		return lessByKind(manifests[i], manifests[j], manifests[i].Head.Kind, manifests[j].Head.Kind, ordering, alphabetical)
 	})
 
 	return manifests
 }
 
-func lessByKind(a interface{}, b interface{}, kindA string, kindB string, o KindSortOrder) bool {
+func lessByKind(a interface{}, b interface{}, kindA string, kindB string, o KindSortOrder, alphabetical bool) bool {
 	ordering := make(map[string]int, len(o))
 	for v, k := range o {
 		ordering[k] = v
@@ -123,10 +130,17 @@ func lessByKind(a interface{}, b interface{}, kindA string, kindB string, o Kind
 	first, aok := ordering[kindA]
 	second, bok := ordering[kindB]
 
+	manifestA, _ := a.(releaseutil.Manifest)
+	manifestB, _ := b.(releaseutil.Manifest)
+
 	if !aok && !bok {
 		// if both are unknown then sort alphabetically by kind, keep original order if same kind
 		if kindA != kindB {
 			return kindA < kindB
+		}
+		if alphabetical && kindA == kindB {
+			// sort alphabetically only if kind is equal
+			return manifestA.Name < manifestB.Name
 		}
 		return first < second
 	}
@@ -136,6 +150,10 @@ func lessByKind(a interface{}, b interface{}, kindA string, kindB string, o Kind
 	}
 	if !bok {
 		return true
+	}
+	if alphabetical && kindA == kindB {
+		// sort alphabetically only if kind is equal
+		return manifestA.Name < manifestB.Name
 	}
 	// sort different kinds, keep original order if same priority
 	return first < second
